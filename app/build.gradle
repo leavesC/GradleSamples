@@ -1,0 +1,103 @@
+apply plugin: 'com.android.application'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def keyStorePath_ = properties.getProperty("key.keyStorePath")
+def storePassword_ = properties.getProperty("key.storePassword")
+def keyAlias_ = properties.getProperty("key.keyAlias")
+def keyPassword_ = properties.getProperty("key.keyPassword")
+def storeFile_ = file(keyStorePath_)
+
+def globalConfiguration = rootProject.ext
+def presentationDependencies = globalConfiguration.dependencies
+
+static def buildTime() {
+    return new Date().format("yyyy-MM-dd HH:mm:ss")
+}
+
+static def hostName() {
+    return System.getProperty("user.name") + "@" + InetAddress.localHost.hostName
+}
+
+android {
+    compileSdkVersion globalConfiguration["compileSdkVersion"]
+    defaultConfig {
+        applicationId defaultApplicationId
+        minSdkVersion globalConfiguration["minSdkVersion"]
+        targetSdkVersion globalConfiguration["targetSdkVersion"]
+        versionCode globalConfiguration["versionCode"]
+        versionName globalConfiguration["versionName"]
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        flavorDimensions '1'
+        resValue "string", "build_host", hostName()
+        buildConfigField "String", "build_time", "\"" + buildTime() + "\""
+    }
+
+    signingConfigs {
+        release {
+            storeFile storeFile_
+            storePassword storePassword_
+            keyAlias keyAlias_
+            keyPassword keyPassword_
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+        debug {
+            storeFile storeFile_
+            storePassword storePassword_
+            keyAlias keyAlias_
+            keyPassword keyPassword_
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    productFlavors {
+        yingyongbao {
+            applicationId yingyongbaoApplicationId
+            buildConfigField "String", "channelId", yingyongbaoChannelId
+            manifestPlaceholders = [appKey: yingyongbaoAppKey]
+        }
+        wandoujia {
+            applicationId wandoujiaApplicationId
+            buildConfigField "String", "channelId", wandoujiaChannelId
+            manifestPlaceholders = [appKey: wandoujiaAppKey]
+        }
+        xiaomi {
+            applicationId xiaomiApplicationId
+            buildConfigField "String", "channelId", xiaomiChannelId
+            manifestPlaceholders = [appKey: xiaomiAppKey]
+        }
+    }
+
+    applicationVariants.all { variant ->
+        def buildType = variant.buildType.name
+        def flavorName = variant.flavorName
+        def createTime = new Date().format("YYYY-MM-dd_hh_mm_ss", TimeZone.getTimeZone("GMT+08:00"))
+        variant.outputs.all {
+            outputFileName = flavorName + "_" + buildType + "_v" + defaultConfig.versionName + "_" + createTime + ".apk"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation presentationDependencies.appcompatV7
+    implementation presentationDependencies.constraintLayout
+    testImplementation presentationDependencies.junit
+    androidTestImplementation presentationDependencies.testRunner
+    androidTestImplementation presentationDependencies.espressoCore
+}
