@@ -372,6 +372,9 @@ static def hostName() {
 
 此时可以以各个 `productFlavor` 的名称来命名相应的文件夹，并在其中放置相应的图标文件以及声明了应用名称的 `string.xml` 文件，这样在多渠道打包时，Gradle 就会自动引用相应的资源文件
 
+![](https://upload-images.jianshu.io/upload_images/2552605-717c6ff61425a07f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![](https://upload-images.jianshu.io/upload_images/2552605-496f4b5c470677b0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 **上述所有的示例代码可以在这里获取：[GradleSamples](https://github.com/leavesC/GradleSamples)**
