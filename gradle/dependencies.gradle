@@ -1,0 +1,22 @@
+//需要注意
+//1. 当依赖库的引用方式是 kapt 时，其 key 名必须以 kapt 结尾
+//2. 当依赖库的引用方式是 debugImplementation 时，其 key 名必须以 debugImpl 结尾
+//3. 当依赖库的引用方式是 releaseImplementation 时，其 key 名必须以 releaseImpl 结尾
+//4. 当依赖库的引用方式是 testImplementation 时，其 key 名必须以 testImpl 结尾
+//5. 当依赖库的引用方式是 androidTestImplementation 时，其 key 名必须以 androidTestImpl 结尾
+//6. 当依赖库的引用方式是 implementation 时，其 key 名后缀只要不和以上所述重复即可
+
+ext {
+    dependencies_library = [
+            "kotlin-stdlib"                          : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
+            "androidx.core-ktx"                      : "androidx.core:core-ktx:1.3.0",
+            'androidx.appcompat'                     : 'androidx.appcompat:appcompat:1.1.0',
+            "constraintlayout"                       : "androidx.constraintlayout:constraintlayout:1.1.3",
+            "junit-testImpl"                         : "junit:junit:4.13",
+            "androidx.test.ext:junit-androidTestImpl": "androidx.test.ext:junit:1.1.1",
+            "androidx.test.espresso-androidTestImpl" : "androidx.test.espresso:espresso-core:3.2.0"
+    ]
+
+    dependencies_all = [:]
+    dependencies_all.putAll(dependencies_library)
+}

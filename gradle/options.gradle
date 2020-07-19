@@ -1,0 +1,88 @@
+apply from: "${rootDir}${File.separator}gradle${File.separator}function.gradle"
+
+if (FunctionExt.isAppModule()) {
+    apply plugin: 'com.android.application'
+    appModuleAction()
+} else {
+    apply plugin: 'com.android.library'
+}
+
+def appModuleAction() {
+    android {
+        defaultConfig {
+            applicationId applicationIdExt.toString()
+        }
+        signingConfigs {
+            def propertiesEntity = FunctionExt.getPropertiesEntity(file(keyPropertiesFilePathExt).path)
+            releaseConfig {
+                storeFile file(keyFilePathExt)
+                storePassword propertiesEntity['storePassword'].toString()
+                keyAlias propertiesEntity['keyAlias'].toString()
+                keyPassword propertiesEntity['keyPassword'].toString()
+                v1SigningEnabled releaseV1SigningEnabledExt.toBoolean()
+                v2SigningEnabled releaseV2SigningEnabledExt.toBoolean()
+            }
+            debugConfig {
+                storeFile file(keyFilePathExt)
+                storePassword propertiesEntity['storePassword'].toString()
+                keyAlias propertiesEntity['keyAlias'].toString()
+                keyPassword propertiesEntity['keyPassword'].toString()
+                v1SigningEnabled debugV1SigningEnabledExt.toBoolean()
+                v2SigningEnabled debugV1SigningEnabledExt.toBoolean()
+            }
+        }
+        buildTypes {
+            release {
+                signingConfig signingConfigs.releaseConfig
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            }
+        }
+        applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "${variant.name}_v${variant.versionName}_${FunctionExt.buildTime()}.apk"
+            }
+        }
+    }
+}
+
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: "${rootDir}${File.separator}gradle${File.separator}dependencies.gradle"
+
+
+android {
+    compileSdkVersion compileSdkVersionExt.toInteger()
+    buildToolsVersion buildToolsVersionExt.toString()
+    defaultConfig {
+        minSdkVersion minSdkVersionExt.toInteger()
+        targetSdkVersion targetSdkVersionExt.toInteger()
+        versionCode versionCodeExt.toInteger()
+        versionName versionNameExt.toString()
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    dependencies_library.each { key, value ->
+        if (key.endsWith("kapt")) {
+            kapt value
+        } else if (key.endsWith("debugImpl")) {
+            debugImplementation value
+        } else if (key.endsWith("releaseImpl")) {
+            releaseImplementation value
+        } else if (key.endsWith("testImpl")) {
+            testImplementation value
+        } else if (key.endsWith("androidTestImpl")) {
+            androidTestImplementation value
+        } else {
+            implementation value
+        }
+    }
+}

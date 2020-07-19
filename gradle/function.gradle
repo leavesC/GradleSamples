@@ -1,0 +1,36 @@
+ext.FunctionExt = [
+        isAppModule        : {
+            project.name == project.rootProject.subprojects[0].name
+        },
+
+        getPropertiesEntity: { filePath ->
+            def properties = new Properties()
+            def inputStream = null
+            try {
+                inputStream = new File(filePath).newDataInputStream()
+                properties.load(inputStream)
+                def map = [:]
+                properties.entrySet().each {
+                    map[it.key] = it.value
+                }
+                return map
+            } catch (Exception e) {
+                throw e
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close()
+                }
+            }
+        },
+
+        getPropertieValue  : { path, key ->
+            return getPropertiesEntity(path, key)
+        },
+
+        buildTime          : {
+            def date = new Date()
+            def formattedDate = date.format('yyyy_MM_dd_HH_mm')
+            return formattedDate
+        },
+
+]
